@@ -21,10 +21,10 @@ jobs:
         git clone https://github.com/cdle/jd_study.git  ./jd_study
         cp -rf ./jd_study/jdc/* ./
         rm -rf ./jd_study
-        CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 go build -o JDCarm
-        CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o JDCarm64
-        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o JDCamd64
-        CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -o JDCamd64.exe
+        CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 go build -o JDC-armv7
+        CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o JDC-arm64
+        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o JDC-amd64
+        CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -o JDC-amd64.exe
     - name: 'Commit Files'
       id: commit
       run: |
