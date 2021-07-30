@@ -1,9 +1,13 @@
 name: jdc
+  
 on:
+  push:
+    branches: 
+      - main
   schedule:
-    - cron: 10 */2 * * *
-  watch:
-    types: started
+    - cron: "10 */2 * * *"
+  workflow_dispatch:
+  
 jobs:
   build:
     runs-on: Ubuntu-20.04  
