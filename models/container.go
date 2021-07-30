@@ -27,7 +27,6 @@ func initContainer() {
 		if Config.Containers[i].Weigth == 0 {
 			Config.Containers[i].Weigth = 1
 		}
-		Config.Containers[i].First = true
 		switch Config.Containers[i].Type {
 		case "ql":
 			vv := regexp.MustCompile(`^(https?://[\.\w]+:?\d*)`).FindStringSubmatch(Config.Containers[i].Address)
@@ -195,12 +194,9 @@ func (c *Container) read() error {
 							PtPin:     v[2],
 							Available: True,
 						})
-					} else if c.First == false {
+					} else {
 						if nck.PtKey != v[1] {
-							nck.Updates(map[string]interface{}{
-								"PtKey":     v[1],
-								"Available": True,
-							})
+							nck.toPool(v[1])
 						}
 					}
 				}
@@ -238,12 +234,9 @@ func (c *Container) read() error {
 							PtPin:     res[2],
 							Available: True,
 						})
-					} else if c.First == false {
+					} else {
 						if res[1] != nck.PtKey {
-							nck.Updates(map[string]interface{}{
-								"PtKey":     res[1],
-								"Available": True,
-							})
+							nck.toPool(res[1])
 						}
 					}
 				}
@@ -269,12 +262,9 @@ func (c *Container) read() error {
 						PtPin:     pt[3],
 						Available: True,
 					})
-				} else if c.First == false {
+				} else {
 					if nck.PtKey != pt[2] {
-						nck.Updates(map[string]interface{}{
-							"PtKey":     pt[2],
-							"Available": True,
-						})
+						nck.toPool(pt[2])
 					}
 				}
 				continue
@@ -300,19 +290,15 @@ func (c *Container) read() error {
 						PtPin:     pt[2],
 						Available: True,
 					})
-				} else if c.First == false {
+				} else {
 					if nck.PtKey != pt[1] {
-						nck.Updates(map[string]interface{}{
-							"PtKey":     pt[1],
-							"Available": True,
-						})
+						nck.toPool(pt[1])
 					}
 				}
 				continue
 			}
 		}
 	}
-	c.First = false
 	return nil
 }
 
