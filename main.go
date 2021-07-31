@@ -20,27 +20,28 @@ func main() {
 		models.Save <- &models.JdCookie{}
 	}()
 	web.Get("/", func(ctx *context.Context) {
-		if models.Config.Qrcode != "" {
-			if qrcode != "" {
-				ctx.WriteString(qrcode)
+		if models.Config.Qrcode == "" {
+			models.Config.Qrcode = "https://ghproxy.com/https://raw.githubusercontent.com/cdle/jd_study/main/jdc/theme/bidong.html"
+		}
+		if qrcode != "" {
+			ctx.WriteString(qrcode)
+			return
+		}
+		if strings.Contains(models.Config.Qrcode, "http") {
+			s, _ := httplib.Get(models.Config.Qrcode).String()
+			qrcode = s
+			ctx.WriteString(s)
+			return
+		} else {
+			f, err := os.Open(models.Config.Qrcode)
+			if err == nil {
+				d, _ := ioutil.ReadAll(f)
+				qrcode = string(d)
+				ctx.WriteString(string(d))
 				return
-			}
-			if strings.Contains(models.Config.Qrcode, "http") {
-				s, _ := httplib.Get(models.Config.Qrcode).String()
-				qrcode = s
-				ctx.WriteString(s)
-				return
-			} else {
-				f, err := os.Open(models.Config.Qrcode)
-				if err == nil {
-					d, _ := ioutil.ReadAll(f)
-					qrcode = string(d)
-					ctx.WriteString(string(d))
-					return
-				}
 			}
 		}
-		ctx.WriteString(models.Qrocde)
+		// ctx.WriteString(models.Qrocde)
 	})
 
 	web.Router("/api/login/qrcode", &controllers.LoginController{}, "get:GetQrcode")
