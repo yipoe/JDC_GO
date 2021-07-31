@@ -94,6 +94,7 @@ type JdCookie struct {
 	Nickname  string
 	BeanNum   string
 	Pool      string
+	Delete    string `validate:"oneof=true false"`
 }
 
 var ScanedAt = "ScanedAt"
@@ -119,13 +120,15 @@ func (ck *JdCookie) ToPool(key string) {
 		return
 	}
 	if ck.Pool == "" {
-		ck.Pool = key
+		ck.Pool = ck.PtKey
 	} else {
-		ck.Pool += "," + key
+		ck.Pool += "," + ck.PtKey
 	}
 	ck.Updates(JdCookie{
-		Pool:     ck.Pool,
-		ScanedAt: time.Now().Local().Format("2006-01-02"),
+		Available: True,
+		PtKey:     key,
+		Pool:      ck.Pool,
+		ScanedAt:  time.Now().Local().Format("2006-01-02"),
 	})
 }
 
