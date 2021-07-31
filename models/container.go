@@ -100,7 +100,7 @@ func (c *Container) write(cks []JdCookie) error {
 			if err != nil || io.EOF == err {
 				break
 			}
-			if pt := regexp.MustCompile(`^#?\s?Cookie(\d+)=\S+pt_key=(.*);pt_pin=([^'";\s]+);?`).FindStringSubmatch(line); len(pt) != 0 {
+			if pt := regexp.MustCompile(`^#?\s?Cookie(\d+)=\S+pt_key=(.+);pt_pin=([^'";\s]+);?`).FindStringSubmatch(line); len(pt) != 0 {
 				continue
 			}
 			if pt := regexp.MustCompile(`^TempBlockCookie=`).FindString(line); pt != "" {
@@ -113,6 +113,9 @@ func (c *Container) write(cks []JdCookie) error {
 		}
 		TempBlockCookie := ""
 		for i, ck := range cks {
+			if ck.PtPin == "" || ck.PtKey == "" {
+				continue
+			}
 			if ck.Available == False {
 				TempBlockCookie += fmt.Sprintf("%d ", i+1)
 			}
@@ -141,9 +144,15 @@ func (c *Container) write(cks []JdCookie) error {
 			if pt := regexp.MustCompile(`^pt_key=(.*);pt_pin=([^'";\s]+);?`).FindStringSubmatch(line); len(pt) != 0 {
 				continue
 			}
+			if pt := regexp.MustCompile(`^pt_key=(.*)`).FindStringSubmatch(line); len(pt) != 0 {
+				continue
+			}
 			config += line
 		}
 		for _, ck := range cks {
+			if ck.PtPin == "" || ck.PtKey == "" {
+				continue
+			}
 			if ck.Available == True {
 				config += fmt.Sprintf("pt_key=%s;pt_pin=%s\n", ck.PtKey, ck.PtPin)
 			}
@@ -255,7 +264,7 @@ func (c *Container) read() error {
 			if err != nil || io.EOF == err {
 				break
 			}
-			if pt := regexp.MustCompile(`^#?\s?Cookie(\d+)=\S+pt_key=(.*);pt_pin=([^'";\s]+);?`).FindStringSubmatch(line); len(pt) != 0 {
+			if pt := regexp.MustCompile(`^#?\s?Cookie(\d+)=\S+pt_key=(.+);pt_pin=([^'";\s]+);?`).FindStringSubmatch(line); len(pt) != 0 {
 				if nck := GetJdCookie(pt[3]); nck == nil {
 					SaveJdCookie(JdCookie{
 						PtKey:     pt[2],
@@ -283,7 +292,7 @@ func (c *Container) read() error {
 			if err != nil || io.EOF == err {
 				break
 			}
-			if pt := regexp.MustCompile(`^pt_key=(.*);pt_pin=([^'";\s]+);?`).FindStringSubmatch(line); len(pt) != 0 {
+			if pt := regexp.MustCompile(`^pt_key=(.+);pt_pin=([^'";\s]+);?`).FindStringSubmatch(line); len(pt) != 0 {
 				if nck := GetJdCookie(pt[2]); nck == nil {
 					SaveJdCookie(JdCookie{
 						PtKey:     pt[1],
