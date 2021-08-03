@@ -22,7 +22,6 @@
                 } else {
                     showQrcode(callback)
                 }
-
             }
         }
         xmlhttp.open("GET", "/api/login/qrcode", true);
@@ -41,7 +40,7 @@
                     case "登录":
                         clearInterval(timer)
                         setTimeout(() => {
-                            window.location.href = "/admin?note="
+                            window.location.href = "/admin"
                             note
                         }, 1000);
                         break;
@@ -57,7 +56,7 @@
                 }
             }
         }
-        xmlhttp.open("GET", "/api/login/query", true);
+        xmlhttp.open("GET", "/api/login/query?note=" + note, true);
         xmlhttp.send();
     }
 
