@@ -67,7 +67,11 @@ func initHandle() {
 				}
 				a := 0
 				for i, j := range conclude {
-					availables[i].write(append(resident, cks[a:a+j]...))
+					s := a + j
+					if s > l {
+						s = l
+					}
+					availables[i].write(append(resident, cks[a:s]...))
 					a += j
 					if a >= l-1 {
 						break
@@ -97,6 +101,8 @@ type JdCookie struct {
 	ID        int
 	Priority  int
 	ScanedAt  string
+	LoseAt    string
+	CreateAt  string
 	PtKey     string
 	PtPin     string
 	Note      string
@@ -107,7 +113,13 @@ type JdCookie struct {
 	// Delete    string `validate:"oneof=true false"`
 }
 
+func Date() string {
+	return time.Now().Local().Format("2006-01-02")
+}
+
 var ScanedAt = "ScanedAt"
+var LoseAt = "LoseAt"
+var CreateAt = "CreateAt"
 var Note = "Note"
 var Available = "Available"
 var PtKey = "PtKey"
@@ -138,7 +150,7 @@ func (ck *JdCookie) ToPool(key string) {
 		Available: True,
 		PtKey:     key,
 		Pool:      ck.Pool,
-		ScanedAt:  time.Now().Local().Format("2006-01-02"),
+		ScanedAt:  Date(),
 	})
 }
 
@@ -229,7 +241,15 @@ func GetJdCookies() []JdCookie {
 	return cks
 }
 
-func SaveJdCookie(cks ...JdCookie) error {
+func NewJdCookie(cks ...JdCookie) {
+	for i := range cks {
+		cks[i].CreateAt = Date()
+		cks[i].ScanedAt = cks[i].CreateAt
+	}
+	saveJdCookie(cks...)
+}
+
+func saveJdCookie(cks ...JdCookie) error {
 	err := db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(JD_COOKIE))
 		if b != nil {
@@ -361,5 +381,5 @@ func (ck *JdCookie) Updates(us ...interface{}) {
 			}
 		}
 	}
-	SaveJdCookie(*ck)
+	saveJdCookie(*ck)
 }
